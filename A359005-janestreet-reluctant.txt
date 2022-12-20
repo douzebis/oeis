@@ -1,0 +1,82 @@
+%I
+%S 0,1,2,4,7,3,5,8,13,6,10,16,25,12,19,9,14,22,34,52,79,39,59,29,44,21,
+%T 32,15,23,11,17,26,40,61,30,46,70,106,160,241,120,181,90,136,67,33,50,
+%U 24,37,18,28,43,65,98,48,73,36,55,27,41,20,31,47,71,35,53
+%N Jane Street's infinite sidewalk's greedy walk.
+%C The Jane Street greedy walk is obtained by starting on slab 0 of Jane Street's inifinite sidewalk (see A358838) and always jumping backwards preferably than forwards. Also, it is forbidden to visit a slab more than once.
+%C The sequence is well defined. It demonstrably never ends and never repeats.
+%C It is conjectured that the sequence actually visits all nonnegative integers. This is related to the conjecture that given any positive integer n, there exists a minimal Jane Street's path (i.e., with minimal number of jumps) going from slab 0 to slab n, and ending either in "forwards" or in "forwards-forwards-backwards". This would make the sequence a one-to-one mapping of the nonnegative numbers onto themselves. See also A359008.
+%e Let N denote the nonnegative integers.
+%e Let forward and backward denote the forward-jumping and backward-jumping functions as defined in Jane Street's infinite sidewalk rules (see A358838):
+%e forward(n) = n + floor(n/2) + 1
+%e backward(n) = n - floor(n/2) - 1
+%e Finally, let f denote the (demonstrably one-to-one) mapping of NxN to N:
+%e f(i, j) = forward^j(3*i)
+%e The mapping f is illustrated by the following table, where the contents of each cell (i, j) is f(i, j):
+%e .
+%e \j|
+%e i\| 0 1 2 3 4 5 6 7 8 ...
+%e ---+-------------------------------------------------
+%e 0 | 0 1 2 4 7 11 17 26 40 ...
+%e 1 | 3 5 8 13 20 31 47 71 107 ...
+%e 2 | 6 10 16 25 38 58 88 133 200 ...
+%e 3 | 9 14 22 34 52 79 119 179 269 ...
+%e 4 | 12 19 29 44 67 101 152 229 344 ...
+%e 5 | 15 23 35 53 80 121 182 274 412 ...
+%e 6 | 18 28 43 65 98 148 223 335 503 ...
+%e 7 | 21 32 49 74 112 169 254 382 574 ...
+%e 8 | 24 37 56 85 128 193 290 436 655 ...
+%e 9 | 27 41 62 94 142 214 322 484 727 ...
+%e 10 | 30 46 70 106 160 241 362 544 817 ...
+%e 11 | 33 50 76 115 173 260 391 587 881 ...
+%e 12 | 36 55 83 125 188 283 425 638 958 ...
+%e 13 | 39 59 89 134 202 304 457 686 1030 ...
+%e ...| ... ... ... ... ... ... ... ... ... ...
+%e (Note that the first row of the table corresponds to A006999.)
+%e .
+%e Equivalently, we can represent f(i, j) as a(n) for some n. This results in the following alternate illustrative table, where the contents of each cell (i, j) is still f(i, j), but represented as a(n):
+%e .
+%e \j|
+%e i\| 0 1 2 3 4 5 6 7 8 ...
+%e ---+------------------------------------------------------------------------
+%e 0 | a(0) a(1) a(2) a(3) a(4) a(29) a(30) a(31) a(32)
+%e 1 | a(5) a(6) a(7) a(8) a(60) a(61) a(62) a(63) a(91)
+%e 2 | a(9) a(10) a(11) a(12) a(75) a(76) a(77) a(78) a(412)
+%e 3 | a(15) a(16) a(17) a(18) a(19) a(20) a(297) a(298) a(1109)
+%e 4 | a(13) a(14) a(23) a(24) a(44) a(99) a(100) a(258) a(435)
+%e 5 | a(27) a(28) a(64) a(65) a(66) a(67) a(206) a(207) a(208)
+%e 6 | a(49) a(50) a(51) a(52) a(53) a(284) a(285) a(286) a(287)
+%e 7 | a(25) a(26) a(81) a(82) a(83) a(84) a(418) a(419) a(420)
+%e 8 | a(47) a(48) a(103) a(104) a(151) a(152) a(440) a(441) a(442)
+%e 9 | a(58) a(59) a(244) a(245) a(246) a(247) a(248) a(249) a(250)
+%e 10 | a(34) a(35) a(36) a(37) a(38) a(39) a(958) a(959) a(960)
+%e 11 | a(45) a(46) a(212) a(213) a(520) a(521) a(522) a(1455) a(1456)
+%e 12 | a(56) a(57) a(242) a(243) a(290) a(291) a(785) a(786) a(787)
+%e 13 | a(21) a(22) a(299) a(300) a(301) a(302) a(647) a(648) a(3437)
+%e .. |
+%e .
+%e The later illustration helps visualize how {a(n)} works: going from a(n) to a(n+1) results in either
+%e - jumping forwards, thus moving one step to the right in the row of the table, or
+%e - jumping backwards, thus changing row.
+%e This procedure (demonstrably) never creates a gap in the rows of the table.
+%o (Python 3)
+%o def a(n: int) -> int:
+%o if n < 0: raise Exception("n must be a nonnegative integer")
+%o if n == 0: return 0
+%o visited = {0}
+%o slab = 1
+%o for i in range(1, n):
+%o label = 1 + (slab >> 1)
+%o if not slab - label in visited:
+%o slab -= label # moving backwards
+%o else:
+%o slab += label # moving forwards
+%o if slab in visited: raise Exception(f"blocked at slab {slab}")
+%o visited.add(slab)
+%o return slab
+%Y A particular valid path on the Jane Street infinite sidewalk A358838.
+%Y Possibly the reverse mapping of sequence A359008.
+%Y Cf. A006999.
+%K nonn,new
+%O 0,3
+%A _Frederic Ruget_, Dec 10 2022

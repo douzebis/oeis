@@ -1,0 +1,72 @@
+%I
+%S 0,1,2,5,3,6,9,4,7,10,10,5,8,8,11,11,11,6,14,9,9,12,12,12,15,12,7,18,
+%T 15,10,10,10,13,13,13,13,16,16,13,16,8,19,19,16,11,11,11,11,19,14,14,
+%U 14,14,14,22,17,17,17,14,17,17,9,20,20,20,17,17,12,12,12
+%N Minimum number of jumps needed to go from slab 0 to slab n in Jane Street's infinite sidewalk.
+%C Slabs on the sidewalk are numbered n = 0, 1, 2,... and each has a label L(n) = 1, 1, 2, 2, 3, 3,...
+%C At a given slab, a jump can be taken forward or backward by L(n) places (but not back before slab 0).
+%C .
+%C For every n >= 0,
+%C let L(n) = 1 + floor(n/2) -- the label on slab n,
+%C let forward(n) = n + L(n) -- jumping forward,
+%C if n > 0, let backward(n) = n - L(n) -- jumping backward,
+%C let lambda(n) = floor((2/3)*n),
+%C let mu(n) = 1 + 2*n,
+%C let nu(n) = 2 + 2*n.
+%C Observe that given n >= 0, there are exactly two ways of landing onto slab n with a direct jump backwards:
+%C backward-jumping from mu(n) to n, and
+%C backward-jumping from nu(n) to n.
+%C If n is a multiple of 3, there is no other ways of jumping onto slab n. But if n is not a multiple of 3, there is one additional way:
+%C forward-jumping from lambda(n) to n.
+%C (Note that L is A008619, forward(n) == A006999(n+1), lambda is A004523, mu is A005408, nu is A299174.)
+%C .
+%C Every slab n > 0 is reachable from slab 0, since there always exists some slab s < n which reaches n by one or more jumps:
+%C if n != 0 (mod 3), then s = lambda(n) = floor((2/3)*n) takes one forward jump to n,
+%C if n == 0 (mod 3) but n != 0 (mod 9), then s = lambda o lambda o mu(n) = floor((8/9)*n) takes two forward jumps and one backward jump to n,
+%C if n == 0 (mod 9), then s = lambda o lambda o nu(n) = floor((8/9)*n + 6/9) takes two forward jumps and one backward jump to n.
+%C This demonstrates that the sequence never stops.
+%C This also gives the following bounds:
+%C a(n) <= 1 + (4/3)*n,
+%C a(n) <= 6*log(n)/log(9/8).
+%C .
+%C The sequence is a surjective mapping N -> N, since given any n >=0:
+%C a(forward^n(0)) == n.
+%H Atlantis, <a href="https://blog.atlant.is/?p=4034">Infinite sidewalk blog post</a> (in progress).
+%H Jane Street, <a href="https://www.janestreet.com/numberphile/">Numberphile webpage</a>.
+%F -
+%e For n=0, a(0) = 0 since it takes zero jump to go from slab 0 to slab 0.
+%e For n=3, a(3) = 5 jumps is the minimum needed to go from slab 0 to slab 3:
+%e .
+%e 1st 2nd 3rd 4th
+%e jump jump jump jump
+%e ->- ->- ---->---- ------->-------
+%e / \ / \ / \ / \
+%e n 0 1 2 3 4 5 6 7 8 ...
+%e L(n) 1 1 2 2 3 3 4 4 5 ...
+%e \ /
+%e ----------<----------
+%e 5th jump (backwards)
+%o (Python 3)
+%o def a(n: int) -> int:
+%o import itertools
+%o if n < 0: raise Exception("n must be a nonnegative integer")
+%o if n == 0: return 0
+%o if n == 1: return 1
+%o visited = {0, 1} # the slabs we have visited so far
+%o rings = [{0}, {1}] # the slabs ordered by depth (min length of path from 0)
+%o for depth in itertools.count(2):
+%o new_ring = set()
+%o for slab in rings[depth - 1]:
+%o label = (slab >> 1) + 1
+%o for next_slab in {slab - label, slab + label}:
+%o if not next_slab in visited:
+%o if next_slab == n: return depth
+%o visited.add(next_slab)
+%o new_ring.add(next_slab)
+%o rings.append(new_ring)
+%Y Cf. A359005, A359008.
+%Y Always jumping forwards yields A006999.
+%Y In the COMMENTS section, L is A008619, forward(n) == A006999(n+1), lambda is A004523, mu is A005408, nu is A299174.
+%K nonn,new
+%O 0,3
+%A _Frederic Ruget_, Dec 02 2022

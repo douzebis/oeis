@@ -1,0 +1,30 @@
+%I
+%S 0,1,2,5,3,6,9,4,7,15,10,29,13,8,16,27,11,30,49,14,60,25,17,28,47,12,
+%T 31,58,50,23,34,61,26,45,18,64,56,48,75,21,32,59,105,51,24,70,35,62,
+%U 54,81,46,73,19,65,111,57,103,214,76,22,68,33,244,87,106,52
+%N Jane Street's infinite sidewalk's greedy walk inverse mapping.
+%C For n a nonnegative integer, a(n) is the smallest nonnegative integer i such that A359005(i) == n.
+%C In fact, if a(n) exists, it is actually the unique nonnegative integer i such that A359005(i) == n. ({A359005(n)} is demonstrably an injective mapping from the nonnegative integers onto themselves.)
+%C It is conjectured that a(n) exists for all nonnegative n. This has been verified true with a computer for all n < 7884654. This would make {a(n)} a one-to-one mapping from the nonnegative integers onto themselves.
+%D Inverse mapping of A359005.
+%o (Python 3)
+%o def a(n: int) -> int:
+%o if n < 0: raise Exception("n must be a nonnegative integer")
+%o i = 0
+%o if n == 0: return i
+%o visited = {0}
+%o slab = 1
+%o while True:
+%o i += 1
+%o if slab == n: return i
+%o visited.add(slab)
+%o label = 1 + (slab >> 1)
+%o if not slab - label in visited:
+%o slab -= label # jumping backwards
+%o else:
+%o slab += label # jumping forwards
+%o if slab in visited: raise Exception(f"blocked at slab {slab}")
+%Y Cf. A358838, A359005.
+%K nonn,new
+%O 0,3
+%A _Frederic Ruget_, Dec 11 2022
